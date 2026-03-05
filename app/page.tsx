@@ -38,6 +38,7 @@ export default function Home() {
   const [empty, setEmpty] = useState(false);
   const [savedIds, setSavedIds] = useState<Set<number>>(new Set());
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isTransitioning = useRef(false);
 
@@ -134,11 +135,20 @@ export default function Home() {
     }
   }, [currentProject, savedIds, showToast]);
 
-  // Initial load
+  // Initial load + restore saved theme
   useEffect(() => {
     loadNext();
+    const saved = localStorage.getItem('theme') as 'dark' | 'light' | null;
+    if (saved) setTheme(saved);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const toggleTheme = useCallback(() => {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+    localStorage.setItem('theme', next);
+    document.documentElement.classList.toggle('light', next === 'light');
+  }, [theme]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -191,6 +201,9 @@ export default function Home() {
       <header className="site-header">
         <span className="site-name">discover.gh</span>
         <span className="site-tagline">interesting projects from Hacker News</span>
+        <button className="theme-toggle" onClick={toggleTheme} title="Toggle theme">
+          {theme === 'dark' ? '☀︎' : '●'}
+        </button>
       </header>
 
       <div className="card-area">

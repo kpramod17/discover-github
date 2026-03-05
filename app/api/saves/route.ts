@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sql, { initDb } from '@/lib/db';
 import { appendSaveRow } from '@/lib/sheets';
-import { sendSaveLimitEmail } from '@/lib/email';
+import { sendMilestoneEmail } from '@/lib/email';
 
 const SAVE_LIMIT = 500;
 
@@ -49,9 +49,9 @@ export async function POST(req: NextRequest) {
     hn_url,
   }).catch((err) => console.error('Sheet append failed:', err));
 
-  // Fire-and-forget: send limit email exactly at 500
-  if (count === SAVE_LIMIT) {
-    sendSaveLimitEmail().catch((err) => console.error('Limit email failed:', err));
+  // Fire-and-forget: send milestone email at 50, 100, 250, 500
+  if ([50, 100, 250, 500].includes(count)) {
+    sendMilestoneEmail(count).catch((err) => console.error('Milestone email failed:', err));
   }
 
   return NextResponse.json({ ok: true, count });
