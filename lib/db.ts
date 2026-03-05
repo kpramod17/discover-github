@@ -33,8 +33,13 @@ export async function initDb() {
       owner_bio       TEXT,
       owner_repos     INTEGER,
       owner_stars     INTEGER,
-      scraped_at      TIMESTAMPTZ DEFAULT NOW()
+      scraped_at      TIMESTAMPTZ DEFAULT NOW(),
+      source          TEXT DEFAULT 'hackernews'
     )
+  `;
+
+  await sql`
+    ALTER TABLE projects ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'hackernews'
   `;
 
   await sql`
