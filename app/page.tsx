@@ -91,8 +91,18 @@ export default function Home() {
 
   const saveProject = useCallback(async () => {
     if (!currentProject) return;
+
+    // Toggle: unsave if already saved
     if (savedIds.has(currentProject.id)) {
-      showToast('Already saved');
+      const res = await fetch('/api/saves', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ project_id: currentProject.id }),
+      });
+      if (res.ok) {
+        setSavedIds((prev) => { const next = new Set(prev); next.delete(currentProject.id); return next; });
+        showToast('Removed');
+      }
       return;
     }
 

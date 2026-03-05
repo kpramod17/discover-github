@@ -56,3 +56,16 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ ok: true, count });
 }
+
+export async function DELETE(req: NextRequest) {
+  const { project_id } = await req.json();
+  if (!project_id) {
+    return NextResponse.json({ error: 'project_id required' }, { status: 400 });
+  }
+
+  await sql`DELETE FROM saves WHERE project_id = ${project_id}`;
+
+  const [{ count }] = await sql<[{ count: string }]>`SELECT COUNT(*)::text AS count FROM saves`;
+
+  return NextResponse.json({ ok: true, count: Number(count) });
+}
