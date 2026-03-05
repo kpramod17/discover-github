@@ -285,9 +285,9 @@ a:hover { color: var(--accent-hover); }
   font-size: 13px;
   color: var(--text-muted);
   line-height: 1.75;
-  white-space: normal;
+  white-space: pre-wrap;
   display: -webkit-box;
-  -webkit-line-clamp: 5;
+  -webkit-line-clamp: 6;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

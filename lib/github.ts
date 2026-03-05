@@ -82,7 +82,15 @@ export async function getReadmePreview(owner: string, repo: string): Promise<str
       .replace(/\n{3,}/g, '\n\n') // excess newlines
       .trim();
 
-    return clean.slice(0, 600);
+    // Drop short lines (< 30 chars) — likely TOC/nav entries stripped of their links
+    const filtered = clean
+      .split('\n')
+      .filter((line) => line.trim().length === 0 || line.trim().length >= 30)
+      .join('\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+
+    return filtered.slice(0, 600);
   } catch {
     return null;
   }
