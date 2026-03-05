@@ -1,0 +1,16 @@
+name: Daily Scraper
+
+on:
+  schedule:
+    - cron: '0 6 * * *'   # 06:00 UTC every day
+  workflow_dispatch:        # also allows manual trigger from GitHub UI
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger scraper
+        run: |
+          curl -X POST ${{ secrets.APP_URL }}/api/scraper \
+            -H "Authorization: Bearer ${{ secrets.SCRAPER_SECRET }}" \
+            --fail
