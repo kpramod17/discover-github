@@ -36,9 +36,18 @@ export default function Home() {
   const [visible, setVisible] = useState(true);
   const [showHelp, setShowHelp] = useState(false);
   const [empty, setEmpty] = useState(false);
+  const [savedIds, setSavedIds] = useState<Set<number>>(new Set());
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isTransitioning = useRef(false);
 
   const currentProject = history[historyIndex] ?? null;
+
+  const showToast = useCallback((msg: string, duration = 2000) => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToastMsg(msg);
+    toastTimer.current = setTimeout(() => setToastMsg(null), duration);
+  }, []);
 
   const transition = useCallback(async (fn: () => Promise<void>) => {
     if (isTransitioning.current) return;
@@ -80,6 +89,41 @@ export default function Home() {
     });
   }, [transition, historyIndex]);
 
+  const saveProject = useCallback(async () => {
+    if (!currentProject) return;
+    if (savedIds.has(currentProject.id)) {
+      showToast('Already saved');
+      return;
+    }
+
+    const res = await fetch('/api/saves', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        project_id: currentProject.id,
+        github_owner: currentProject.github_owner,
+        github_repo: currentProject.github_repo,
+        description: currentProject.description,
+        stars: currentProject.stars,
+        language: currentProject.language,
+        github_url: currentProject.github_url,
+        hn_url: currentProject.hn_url,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (res.status === 400 && data.error === 'limit_reached') {
+      showToast('Save limit reached (500/500)', 3000);
+      return;
+    }
+
+    if (res.ok) {
+      setSavedIds((prev) => new Set(prev).add(currentProject.id));
+      showToast(`Saved! (${data.count}/500)`);
+    }
+  }, [currentProject, savedIds, showToast]);
+
   // Initial load
   useEffect(() => {
     loadNext();
@@ -113,6 +157,9 @@ export default function Home() {
           e.preventDefault();
           goBack();
           break;
+        case 's':
+          saveProject();
+          break;
         case 'g':
           if (currentProject) window.open(currentProject.github_url, '_blank');
           break;
@@ -127,7 +174,7 @@ export default function Home() {
 
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [loadNext, goBack, currentProject, showHelp]);
+  }, [loadNext, goBack, saveProject, currentProject, showHelp]);
 
   return (
     <main className="page">
@@ -157,7 +204,12 @@ export default function Home() {
             </button>
           </div>
         ) : currentProject ? (
-          <ProjectCard project={currentProject} visible={visible} />
+          <ProjectCard
+            project={currentProject}
+            visible={visible}
+            onSave={saveProject}
+            isSaved={savedIds.has(currentProject.id)}
+          />
         ) : null}
       </div>
 
@@ -176,6 +228,14 @@ export default function Home() {
           title="Next (→ ↓ j space)"
         >
           next <span className="nav-key">→</span>
+        </button>
+        <button
+          className="nav-hint"
+          onClick={saveProject}
+          disabled={!currentProject}
+          title="Save (s)"
+        >
+          <span className="nav-key">s</span> save
         </button>
         <button
           className="nav-hint"
@@ -201,6 +261,10 @@ export default function Home() {
           <span className="nav-key">?</span> help
         </button>
       </footer>
+
+      {toastMsg && (
+        <div className="toast">{toastMsg}</div>
+      )}
 
       {showHelp && <KeyboardHelp onClose={() => setShowHelp(false)} />}
     </main>

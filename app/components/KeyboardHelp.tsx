@@ -7,6 +7,7 @@ interface KeyboardHelpProps {
 const shortcuts = [
   { keys: ['→', '↓', 'j', 'Space'], action: 'Next project' },
   { keys: ['←', '↑', 'k'], action: 'Previous project' },
+  { keys: ['s'], action: 'Save project' },
   { keys: ['g'], action: 'Open on GitHub' },
   { keys: ['h'], action: 'Open HN thread' },
   { keys: ['?'], action: 'Toggle this help' },

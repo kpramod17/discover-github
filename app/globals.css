@@ -101,7 +101,25 @@ a:hover { color: var(--accent-hover); }
   border-radius: var(--radius);
   padding: 28px 32px;
   transition: opacity var(--transition);
+  position: relative;
 }
+
+/* Save button */
+.save-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  transition: color var(--transition), transform var(--transition);
+}
+.save-btn:hover { color: var(--text-secondary); transform: scale(1.15); }
+.save-btn.saved { color: var(--accent); }
 
 .card-visible { opacity: 1; }
 .card-hidden  { opacity: 0; }
@@ -383,6 +401,30 @@ a:hover { color: var(--accent-hover); }
   font-weight: 600;
   color: var(--accent);
   font-family: monospace;
+}
+
+/* ── Toast ── */
+.toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 8px 18px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  pointer-events: none;
+  animation: toast-in 200ms ease;
+  z-index: 50;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(6px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
 /* ── Keyboard Help Overlay ── */

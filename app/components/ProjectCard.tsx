@@ -31,11 +31,23 @@ function fmt(n: number): string {
 interface ProjectCardProps {
   project: Project;
   visible: boolean;
+  onSave: () => void;
+  isSaved: boolean;
 }
 
-export function ProjectCard({ project, visible }: ProjectCardProps) {
+export function ProjectCard({ project, visible, onSave, isSaved }: ProjectCardProps) {
   return (
     <article className={`card ${visible ? 'card-visible' : 'card-hidden'}`}>
+
+      {/* Save button */}
+      <button
+        className={`save-btn${isSaved ? ' saved' : ''}`}
+        onClick={onSave}
+        title={isSaved ? 'Saved' : 'Save (s)'}
+        aria-label={isSaved ? 'Saved' : 'Save project'}
+      >
+        {isSaved ? '♥' : '♡'}
+      </button>
 
       {/* HN Section */}
       <div className="card-hn-row">

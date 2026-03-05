@@ -36,4 +36,13 @@ export async function initDb() {
       scraped_at      TIMESTAMPTZ DEFAULT NOW()
     )
   `;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS saves (
+      id         SERIAL PRIMARY KEY,
+      project_id INTEGER NOT NULL REFERENCES projects(id),
+      saved_at   TIMESTAMPTZ DEFAULT NOW(),
+      UNIQUE(project_id)
+    )
+  `;
 }
