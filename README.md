@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# discover.gh
 
-## Getting Started
+Browse interesting GitHub projects surfaced from Hacker News — one at a time.
 
-First, run the development server:
+## What it does
 
+- Daily scraper pulls HN posts that link directly to GitHub repos
+- Enriches each project with GitHub API data (stars, forks, language, topics, README preview, owner stats)
+- Single-project UI with keyboard-driven navigation
+
+## Keyboard shortcuts
+
+| Key | Action |
+|-----|--------|
+| `→` `↓` `j` `Space` | Next project |
+| `←` `↑` `k` | Previous project |
+| `g` | Open on GitHub |
+| `h` | Open HN thread |
+| `?` | Toggle keyboard help |
+
+## Setup
+
+### 1. Clone and install
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/kpramod17/discover-github
+cd discover-github
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Environment variables
+Copy `.env.local.example` to `.env.local` and fill in:
+```
+DATABASE_URL=       # Neon Postgres connection string
+GITHUB_TOKEN=       # GitHub personal access token (read:public_repo)
+SCRAPER_SECRET=     # Random secret to protect the scraper endpoint
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Seed the database
+The schema is auto-created on first scraper run:
+```bash
+curl -X POST http://localhost:3000/api/scraper \
+  -H "Authorization: Bearer YOUR_SCRAPER_SECRET"
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 4. Run locally
+```bash
+npm run dev
+```
 
-## Learn More
+## Deployment (Vercel)
 
-To learn more about Next.js, take a look at the following resources:
+1. Connect this GitHub repo to Vercel
+2. Add environment variables in Vercel project settings
+3. The `vercel.json` cron runs the scraper daily at 06:00 UTC
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Tech stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Next.js 16** (App Router, TypeScript)
+- **Neon Postgres** via `postgres.js`
+- **Tailwind CSS** with custom dark design system
+- **HN Algolia API** for discovering posts
+- **GitHub REST API** for enrichment
