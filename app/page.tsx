@@ -200,7 +200,7 @@ export default function Home() {
     <main className="page">
       <header className="site-header">
         <span className="site-name">discover.gh</span>
-        <span className="site-tagline">interesting projects from Hacker News</span>
+        <span className="site-tagline">interesting projects from across the web</span>
         <button className="theme-toggle" onClick={toggleTheme} title="Toggle theme">
           {theme === 'dark' ? '☀︎' : '●'}
         </button>
